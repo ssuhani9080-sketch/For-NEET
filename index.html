@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NEET Flashcards — Personal</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/icon-192.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">NEET <span>Flash</span></div>
+      <nav>
+        <button id="nav-dashboard" class="nav-item active">Dashboard</button>
+        <button id="nav-questions" class="nav-item">Questions</button>
+        <button id="nav-knowledge" class="nav-item">Knowledge</button>
+        <button id="nav-search" class="nav-item">Search</button>
+        <button id="nav-settings" class="nav-item">Settings</button>
+      </nav>
+      <div class="sidebar-foot">
+        <button id="add-quick" class="primary fab">+ Add</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="searchbar">
+          <input id="global-search" placeholder="Search cards, topics or tags…" />
+        </div>
+        <div class="top-actions">
+          <button id="theme-toggle" title="Toggle theme">🌓</button>
+        </div>
+      </header>
+
+      <section id="view-dashboard" class="view">
+        <h2>Dashboard</h2>
+        <div class="grid">
+          <div class="card small">
+            <h3>Revision queue</h3>
+            <div id="rev-queue">No items yet</div>
+          </div>
+          <div class="card small">
+            <h3>Recent knowledge</h3>
+            <div id="recent-kp">No items yet</div>
+          </div>
+          <div class="card">
+            <h3>Quick Add Question</h3>
+            <form id="quick-add-form">
+              <select id="quick-subject"><option value="">Select subject</option><option>Biology</option><option>Chemistry</option><option>Physics</option></select>
+              <textarea id="quick-text" placeholder="Paste question text"></textarea>
+              <div class="row">
+                <input type="file" id="quick-image" accept="image/*" />
+                <button type="button" id="quick-ocr">OCR</button>
+              </div>
+              <div class="row">
+                <input id="quick-source" placeholder="Source (optional)" />
+                <select id="quick-diff"><option value="">Difficulty</option><option>Easy</option><option>Medium</option><option>Hard</option></select>
+              </div>
+              <div class="row right">
+                <button class="primary" id="quick-save">Save</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-questions" class="view hidden">
+        <div class="view-header">
+          <h2>Questions</h2>
+          <div class="filters">
+            <select id="filter-subject"><option value="">All subjects</option><option>Biology</option><option>Chemistry</option><option>Physics</option></select>
+            <select id="filter-diff"><option value="">All difficulty</option><option>Easy</option><option>Medium</option><option>Hard</option></select>
+            <input id="filter-tag" placeholder="Filter tag" />
+          </div>
+        </div>
+        <div id="questions-list" class="cards"></div>
+      </section>
+
+      <section id="view-knowledge" class="view hidden">
+        <div class="view-header">
+          <h2>Knowledge Bank</h2>
+          <div class="filters">
+            <select id="kp-filter-subject"><option value="">All subjects</option><option>Biology</option><option>Chemistry</option><option>Physics</option></select>
+            <input id="kp-search" placeholder="Search knowledge…" />
+          </div>
+        </div>
+        <div id="kp-areas"></div>
+      </section>
+
+      <section id="view-search" class="view hidden">
+        <h2>Search External Resources</h2>
+        <div class="card">
+          <p>Use the search below to open site-limited results (Vedantu, Doubtnut, BYJU'S, Brainly).</p>
+          <div class="row">
+            <input id="lookup-query" placeholder="e.g., Osmosis MCQ NEET" />
+            <button id="btn-lookup">Open</button>
+          </div>
+          <div class="links">
+            <a target="_blank" id="lnk-vedantu">Vedantu</a>
+            <a target="_blank" id="lnk-doubtnut">Doubtnut</a>
+            <a target="_blank" id="lnk-byjus">BYJU'S</a>
+            <a target="_blank" id="lnk-brainly">Brainly</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-settings" class="view hidden">
+        <h2>Settings</h2>
+        <div class="card">
+          <h3>AI (optional)</h3>
+          <p>Paste your OpenAI API key to enable richer solutions (stored locally).</p>
+          <input id="api-key" placeholder="sk-..." />
+          <div class="row">
+            <button id="save-api" class="primary">Save key</button>
+            <button id="clear-api" class="danger">Clear key</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Backup</h3>
+          <div class="row">
+            <button id="export-json" class="primary">Export JSON</button>
+            <input type="file" id="import-file" accept="application/json" />
+            <button id="import-json">Import JSON</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <template id="tpl-card">
+    <div class="card flashcard">
+      <div class="card-head">
+        <span class="pill subject"></span>
+        <span class="pill diff"></span>
+        <div class="right">
+          <button class="save-qa">☆</button>
+          <button class="flip">Flip</button>
+          <button class="more">⋯</button>
+        </div>
+      </div>
+      <div class="card-body front"></div>
+      <div class="card-body back hidden"></div>
+      <div class="card-foot small"></div>
+    </div>
+  </template>
+
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
