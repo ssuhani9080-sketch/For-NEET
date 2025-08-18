@@ -18,7 +18,11 @@
   const CHAPTER_MAP=[{subject:'Biology',chapter:'Molecular Basis of Inheritance',keywords:['dna','rna','replication','polymerase','transcription','translation','gene','chromosome']},{subject:'Biology',chapter:'Human Reproduction',keywords:['spermatogenesis','oogenesis','menstrual','implantation','fertilization','ovary','testes']},{subject:'Chemistry',chapter:'Aldehydes, Ketones',keywords:['aldehyde','ketone','iodoform','carbonyl','acyl','nucleophile']},{subject:'Physics',chapter:'Work, Energy & Power',keywords:['work','energy','power','kinetic','potential']},{subject:'Physics',chapter:'Electrostatics',keywords:['charge','coulomb','electric','capacitor','field','potential']}];
   function detectChapters(text, subjectHint){const t=(text||'').toLowerCase();const hits=new Set();CHAPTER_MAP.forEach(m=>{if(subjectHint && m.subject!==subjectHint) return; m.keywords.forEach(k=>{ if(t.includes(k)) hits.add(m.chapter); });}); return Array.from(hits); }
 
-  Object.keys(nav).forEach(k=> nav[k].addEventListener('click', ()=> showView(k)));
+  Object.keys(nav).forEach(k=>nav[k].addEventListener('click', ()=> showView(k)));
+  // Add button binding
+$('#add-quick').onclick = ()=>{
+  showView('questions');
+  $('#quick-text').focus();};
   function showView(name){ Object.values(nav).forEach(b=>b.classList.remove('active')); nav[name].classList.add('active'); Object.values(views).forEach(v=>v.classList.add('hidden')); views[name].classList.remove('hidden'); }
 
   $('#quick-ocr').onclick = async ()=>{ const f = $('#quick-image').files[0]; if(!f) return alert('Upload image first'); $('#quick-ocr').disabled=true; $('#quick-ocr').textContent='Running OCR…'; try{ const data = await fileToDataURL(f); const worker = await Tesseract.createWorker(); await worker.load(); await worker.loadLanguage('eng'); await worker.initialize('eng'); const { data: { text } } = await worker.recognize(data); await worker.terminate(); $('#quick-text').value = ($('#quick-text').value + '\n' + text.trim()).trim(); }catch(e){ alert('OCR error: '+e.message); } $('#quick-ocr').disabled=false; $('#quick-ocr').textContent='OCR'; };
