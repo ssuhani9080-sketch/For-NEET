@@ -7,7 +7,13 @@
   const list = $('#questions-list');
   const kpAreas = $('#kp-areas');
 
-  DB.openDB().then(async ()=>{ const theme = await DB.getSetting('theme'); if(theme) document.documentElement.setAttribute('data-theme', theme); bindUI(); renderDashboard(); renderQuestions(); renderKPs(); });
+  DB.openDB().then(async ()=>{
+    const theme = await DB.getSetting('theme');
+    if(theme) document.documentElement.setAttribute('data-theme', theme);
+    renderDashboard();
+    renderQuestions();
+    renderKPs();
+  });
 
   const CHAPTER_MAP=[{subject:'Biology',chapter:'Molecular Basis of Inheritance',keywords:['dna','rna','replication','polymerase','transcription','translation','gene','chromosome']},{subject:'Biology',chapter:'Human Reproduction',keywords:['spermatogenesis','oogenesis','menstrual','implantation','fertilization','ovary','testes']},{subject:'Chemistry',chapter:'Aldehydes, Ketones',keywords:['aldehyde','ketone','iodoform','carbonyl','acyl','nucleophile']},{subject:'Physics',chapter:'Work, Energy & Power',keywords:['work','energy','power','kinetic','potential']},{subject:'Physics',chapter:'Electrostatics',keywords:['charge','coulomb','electric','capacitor','field','potential']}];
   function detectChapters(text, subjectHint){const t=(text||'').toLowerCase();const hits=new Set();CHAPTER_MAP.forEach(m=>{if(subjectHint && m.subject!==subjectHint) return; m.keywords.forEach(k=>{ if(t.includes(k)) hits.add(m.chapter); });}); return Array.from(hits); }
@@ -51,4 +57,4 @@
   function escapeHTML(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function fileToDataURL(f){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); }); }
   function renderMath(el){ try{ renderMathInElement(el, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]}); }catch(e){} } 
-})();   <!-- ✅ added closure -->
+})();
